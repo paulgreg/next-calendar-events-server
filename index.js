@@ -10,7 +10,7 @@ const today = new Date()
 today.setHours(0)
 today.setMinutes(0)
 today.setSeconds(0)
-const in3Days = new Date(today.getTime() + DAY * 3)
+const inFewDays = new Date(today.getTime() + DAY * 7)
 
 function getEvents({ url, auth, calendar }) {
     return new Promise((resolve, reject) => {
@@ -33,7 +33,7 @@ Promise.all(calendars.map(calendar => getEvents(calendar)))
                     const { summary, description, location, start, end } = ev
                     const dateStart = new Date(start)
                     const dateEnd = new Date(end)
-                    if ((dateStart > today && dateEnd < in3Days) || (dateStart < now && dateEnd > now) /* for events starting or ending in or a few days ago */) {
+                    if ((dateStart > today && dateEnd < inFewDays) || (dateStart < now && dateEnd > now) /* for events starting or ending in or a few days ago */) {
                         events.push({ calendar, dateStart, summary, description, location })
                     }
                 }
