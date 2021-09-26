@@ -1,0 +1,4 @@
+modules.exports = [
+    { calendar: 'Bob', url: `https://example.com/calendar.ics`, auth: 'Basic base64(login:password)' },
+    ...
+]

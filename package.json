@@ -1,0 +1,14 @@
+{
+  "name": "next-calendar-events-server",
+  "version": "1.0.0",
+  "description": "Fetch next events in multiples calendars and write them in a json file",
+  "main": "index.js",
+  "scripts": {
+    "start": "mkdir -p ./dist && node index.js"
+  },
+  "author": "Grégory PAUL",
+  "license": "GPL-3.0-only",
+  "dependencies": {
+    "node-ical": "^0.13.0"
+  }
+}
