@@ -38,7 +38,7 @@ Promise.all(calendars.map(calendar => getEvents(calendar)))
                     dateStart.setTime(dateStart.getTime() - tzOffset)
                     dateEnd.setTime(dateEnd.getTime() - tzOffset)
                     if ((dateStart > today && dateEnd < inFewDays) || (dateStart < now && dateEnd > now) /* for events starting or ending in or a few days ago */) {
-                        events.push({ calendar, dateStart, summary, description, location })
+                        events.push({ calendar, dateStart, dateEnd, summary, location })
 
                     }
                 }
