@@ -4,13 +4,15 @@ const calendars = require('./parameters')
 
 const SAVED_FILE = './dist/next-events.json'
 
+const tzOffset = new Date().getTimezoneOffset() * 60 * 1000
 const DAY = 24 * 60 * 60 * 1000
 const now = Date.now()
 const today = new Date()
-today.setHours(0)
-today.setMinutes(0)
-today.setSeconds(0)
+today.setUTCHours(0)
+today.setUTCMinutes(0)
+today.setUTCSeconds(0)
 const inFewDays = new Date(today.getTime() + DAY * 7)
+
 
 function getEvents({ url, auth, calendar }) {
     return new Promise((resolve, reject) => {
@@ -33,8 +35,11 @@ Promise.all(calendars.map(calendar => getEvents(calendar)))
                     const { summary, description, location, start, end } = ev
                     const dateStart = new Date(start)
                     const dateEnd = new Date(end)
+                    dateStart.setTime(dateStart.getTime() - tzOffset)
+                    dateEnd.setTime(dateEnd.getTime() - tzOffset)
                     if ((dateStart > today && dateEnd < inFewDays) || (dateStart < now && dateEnd > now) /* for events starting or ending in or a few days ago */) {
                         events.push({ calendar, dateStart, summary, description, location })
+
                     }
                 }
             })
