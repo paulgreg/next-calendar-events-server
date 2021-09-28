@@ -11,6 +11,7 @@ const today = new Date()
 today.setUTCHours(0)
 today.setUTCMinutes(0)
 today.setUTCSeconds(0)
+today.setUTCMilliseconds(0)
 const inFewDays = new Date(today.getTime() + DAY * 7)
 
 
@@ -30,19 +31,20 @@ Promise.all(calendars.map(calendar => getEvents(calendar)))
     .then(datas => {
         const events = []
         datas.forEach(({ calendar, data }) => {
-            Object.values(data).forEach(ev => {
-                if (ev.type == 'VEVENT') {
+            Object.values(data)
+                .filter(({ type }) => type === 'VEVENT')
+                .forEach(ev => {
                     const { summary, description, location, start, end } = ev
                     const dateStart = new Date(start)
                     const dateEnd = new Date(end)
                     dateStart.setTime(dateStart.getTime() - tzOffset)
                     dateEnd.setTime(dateEnd.getTime() - tzOffset)
-                    if ((dateStart > today && dateEnd < inFewDays) || (dateStart < now && dateEnd > now) /* for events starting or ending in or a few days ago */) {
-                        events.push({ calendar, dateStart, dateEnd, summary, location })
-
-                    }
-                }
-            })
+                    const dayEvent = dateStart === today
+                    const laterEvent = (dateStart > now && dateEnd < inFewDays)
+                    const inRangeEvent = (dateStart < now && dateEnd > now) // for events starting or ending in or a few days ago
+                    if (dayEvent || laterEvent || inRangeEvent)
+                        events.push({ calendar, dateStart, dateEnd, summary, location, today })
+                })
         })
         return events
     }).then(events => {
