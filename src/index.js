@@ -2,7 +2,7 @@ const ical = require('node-ical')
 const fs = require('fs')
 const calendars = require('../parameters')
 const { formatEvent } = require('./string')
-const { formatDate, getDates, checkIfDateInRange, checkIfPeriodicEvent } = require('./date')
+const { formatDate, getDates, checkIfDateInRange, checkIfPeriodicEvent, isToday } = require('./date')
 
 const SAVED_FILE = './dist/next-events.json'
 
@@ -28,33 +28,36 @@ Promise.all(calendars.map(calendar => getEvents(calendar)))
             Object.values(data)
                 .filter(({ type }) => type === 'VEVENT')
                 .forEach(ev => {
-                    const { summary, location, start, end } = ev
+                    const { summary, start, end } = ev
                     const dateStart = formatDate(dates, start)
                     const dateEnd = formatDate(dates, end)
 
+                    console.log(dateStart, summary)
+
+                    const formatedEvent = formatEvent({
+                        calendar,
+                        summary,
+                    })
+
                     if (checkIfDateInRange(dates, { dateStart, dateEnd })) {
-                        events.push(formatEvent({
-                            calendar,
+                        events.push({
+                            ...formatedEvent,
                             dateStart,
                             dateEnd,
-                            summary,
-                            location,
-                            today
-                        }))
+                            isToday: isToday(today, dateStart)
+                        })
                     }
 
                     const overrideDates = checkIfPeriodicEvent(dates, {
                         dateStart, dateEnd, rrule: ev.rrule
                     })
                     if (overrideDates) {
-                        events.push(formatEvent({
-                            calendar,
-                            summary,
-                            location,
-                            today,
+                        events.push({
+                            ...formatedEvent,
                             dateStart: overrideDates.dateStart,
                             dateEnd: overrideDates.dateEnd,
-                        }))
+                            isToday: isToday(today, overrideDates.dateStart)
+                        })
                     }
                 })
         })

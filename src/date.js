@@ -54,9 +54,20 @@ const checkIfPeriodicEvent = (dates, { dateStart, dateEnd, rrule = {} } = {}) =>
     return false
 }
 
+
+const isToday = (today, date) => {
+    const tonight = new Date(today.getTime())
+    tonight.setUTCHours(23)
+    tonight.setUTCMinutes(59)
+    tonight.setUTCSeconds(59)
+    tonight.setUTCMilliseconds(999)
+    return date <= tonight
+}
+
 module.exports = {
     formatDate,
     getDates,
     checkIfDateInRange,
-    checkIfPeriodicEvent
+    checkIfPeriodicEvent,
+    isToday,
 }

@@ -1,10 +1,11 @@
-const { checkIfDateInRange, formatDate, checkIfPeriodicEvent } = require("./date")
+const { checkIfDateInRange, formatDate, checkIfPeriodicEvent, isToday } = require("./date")
 
 describe('date', () => {
     const HOUR = 60 * 60 * 1000
     const tzOffset = 0
     const now = new Date('2020-01-01T12:00:00.000Z')
     const today = new Date('2020-01-01T00:00:00.000Z')
+    const tomorrow = new Date('2020-01-02T00:00:00.000Z')
     const inFewDays = new Date('2020-01-07T00:00:00.000Z')
     const dates = { now, today, inFewDays, tzOffset }
 
@@ -85,6 +86,17 @@ describe('date', () => {
                 "dateStart": new Date('2020-01-05T12:00:00.000Z'),
                 "dateEnd": new Date('2020-01-05T13:00:00.000Z'),
             })
+        )
+    })
+    describe('isToday', () => {
+        test('should return true for today', () =>
+            expect(isToday(today, today)).toStrictEqual(true)
+        )
+        test('should return true for now', () =>
+            expect(isToday(today, now)).toStrictEqual(true)
+        )
+        test('should return false for tomorrow', () =>
+            expect(isToday(today, tomorrow)).toStrictEqual(false)
         )
     })
 })
