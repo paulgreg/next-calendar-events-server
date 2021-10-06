@@ -46,18 +46,18 @@ Promise.all(calendars.map(calendar => getEvents(calendar)))
                             dateEnd,
                             isToday: isToday(today, dateStart)
                         })
-                    }
-
-                    const overrideDates = checkIfPeriodicEvent(dates, {
-                        dateStart, dateEnd, rrule: ev.rrule
-                    })
-                    if (overrideDates) {
-                        events.push({
-                            ...formatedEvent,
-                            dateStart: overrideDates.dateStart,
-                            dateEnd: overrideDates.dateEnd,
-                            isToday: isToday(today, overrideDates.dateStart)
+                    } else {
+                        const overrideDates = checkIfPeriodicEvent(dates, {
+                            dateStart, dateEnd, rrule: ev.rrule
                         })
+                        if (overrideDates) {
+                            events.push({
+                                ...formatedEvent,
+                                dateStart: overrideDates.dateStart,
+                                dateEnd: overrideDates.dateEnd,
+                                isToday: isToday(today, overrideDates.dateStart)
+                            })
+                        }
                     }
                 })
         })
