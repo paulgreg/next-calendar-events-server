@@ -17,10 +17,10 @@ describe('string', () => {
         test('should remove accents', () =>
             expect(formatEvent({
                 calendar: 'Grégory',
-                summary: 'théâtre Évry l´äïö',
+                summary: 'théâtre Évry l´’’äïö',
             })).toStrictEqual({
                 calendar: 'Gregory',
-                summary: "theatre Evry l'aio",
+                summary: "theatre Evry l'''aio",
             })
         )
         test('should truncate text', () =>
