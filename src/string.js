@@ -1,5 +1,8 @@
 
-const removeAccent = (str = '') => str.normalize ? str.normalize("NFD").replace(/[\u0300-\u036f]/g, "") : ''
+const removeAccent = (str = '') => str
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/´/g, "'")
 
 const truncate = (l = 255) => (str = '') => str.substr(0, l)
 

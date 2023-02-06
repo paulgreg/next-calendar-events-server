@@ -3,18 +3,15 @@ const { formatEvent } = require('./string')
 describe('string', () => {
     describe('formatEvent', () => {
         test('should return object', () =>
-            expect(formatEvent({ a: 1 })).toStrictEqual({ a: 1, location: '', calendar: '', summary: '' })
+            expect(formatEvent({ a: 1 })).toStrictEqual({ a: 1, calendar: '', summary: '' })
         )
         test('should remove accents', () =>
             expect(formatEvent({
                 calendar: 'Grégory',
-                summary: 'théâtre',
-                location: 'Évry'
-
+                summary: 'théâtre Évry l´äïö',
             })).toStrictEqual({
                 calendar: 'Gregory',
-                summary: 'theatre',
-                location: 'Evry'
+                summary: "theatre Evry l'aio",
             })
         )
         test('should truncate text', () =>
