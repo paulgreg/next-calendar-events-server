@@ -5,6 +5,15 @@ describe('string', () => {
         test('should return object', () =>
             expect(formatEvent({ a: 1 })).toStrictEqual({ a: 1, calendar: '', summary: '' })
         )
+        test('should convert object to string', () =>
+            expect(formatEvent({
+                calendar: 'calendar',
+                summary: { val: 'value' },
+            })).toStrictEqual({
+                calendar: 'calendar',
+                summary: "value",
+            })
+        )
         test('should remove accents', () =>
             expect(formatEvent({
                 calendar: 'Grégory',
