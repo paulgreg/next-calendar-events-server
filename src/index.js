@@ -9,8 +9,8 @@ const SAVED_FILE = './dist/next-events.json'
 const dates = getDates()
 const { today } = dates
 
-function getEvents({ url, auth, calendar }) {
-    return new Promise((resolve, reject) => {
+const getEvents = ({ url, auth, calendar }) => 
+    new Promise((resolve, reject) => {
         ical.async.fromURL(url,
             { headers: { 'Authorization': auth } },
             function (err, data) {
@@ -18,8 +18,6 @@ function getEvents({ url, auth, calendar }) {
                 resolve({ calendar, data })
             })
     })
-}
-
 
 Promise.all(calendars.map(calendar => getEvents(calendar)))
     .then(datas => {
@@ -47,9 +45,7 @@ Promise.all(calendars.map(calendar => getEvents(calendar)))
                             isToday: isToday(today, dateStart)
                         })
                     } else {
-                        const overrideDates = checkIfPeriodicEvent(dates, {
-                            dateStart, dateEnd, rrule: ev.rrule
-                        })
+                        const overrideDates = checkIfPeriodicEvent(dates, ev?.rrule?.options)
                         if (overrideDates) {
                             events.push({
                                 ...formatedEvent,

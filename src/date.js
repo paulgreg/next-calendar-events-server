@@ -1,3 +1,5 @@
+const { RRule } = require('rrule')
+
 const DAY = 24 * 60 * 60 * 1000
 
 const formatDate = ({ tzOffset }, date) => {
@@ -27,29 +29,17 @@ const checkIfDateInRange = ({ now, today, inFewDays }, { dateStart, dateEnd }) =
     return dayEvent || laterEvent || inRangeEvent
 }
 
-const checkIfPeriodicEvent = (dates, { dateStart, dateEnd, rrule = {} } = {}) => {
-    const { options } = rrule
-    if (options) {
-        const { now, today, inFewDays } = dates
-        const { freq, until } = options
-        if (freq === 2) { // repeat weekly
-            const untilDate = formatDate(dates, until)
-            let repeatDateStart = dateStart;
-            let repeatDateEnd = dateEnd;
-            while (repeatDateStart < untilDate) {
-                const dayEvent = repeatDateStart.getTime() === today.getTime()
-                const laterEvent = (repeatDateStart > now && repeatDateEnd < inFewDays)
-                if (dayEvent || laterEvent) {
-                    return {
-                        dateStart: repeatDateStart,
-                        dateEnd: repeatDateEnd,
-                    }
-                }
-                repeatDateStart = addDays(repeatDateStart, 7)
-                repeatDateEnd = addDays(repeatDateEnd, 7)
+const checkIfPeriodicEvent = (dates, rrule) => {
+    if (rrule) {
+        const { today, inFewDays } = dates
+        const rruleForEvent = new RRule(rrule)
+        const occurences = rruleForEvent.between(today, inFewDays)
+        if (occurences.length > 0) {
+            return {
+                dateStart: occurences[0],
+                dateEnd: occurences[0]
             }
         }
-        // TODO : handle other « freq »
     }
     return false
 }

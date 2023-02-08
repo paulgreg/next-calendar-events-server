@@ -62,29 +62,19 @@ describe('date', () => {
 
         test('should return false if until date passed', () =>
             expect(checkIfPeriodicEvent(dates, {
-                rrule: {
-                    options: {
-                        freq: 2,
-                        until: new Date('2020-12-31T12:00:00.000Z')
-                    }
-                }
+                freq: 2,
+                until: new Date('2020-12-31T12:00:00.000Z')
             })).toStrictEqual(false)
         )
 
         test('should match if during range', () =>
             expect(checkIfPeriodicEvent(dates, {
-                dateStart: new Date('2019-12-15T12:00:00.000Z'),
-                dateEnd: new Date('2019-12-15T13:00:00.000Z'),
-                rrule: {
-                    options: {
-                        freq: 2,
-                        dtstart: new Date('2019-12-15T00:00:00.000Z'),
-                        until: new Date('2020-01-15T00:00:00.000Z')
-                    }
-                }
+                freq: 2,
+                dtstart: new Date('2019-12-15T12:00:00.000Z'),
+                until: new Date('2022-01-15T12:00:00.000Z')
             })).toStrictEqual({
                 "dateStart": new Date('2020-01-05T12:00:00.000Z'),
-                "dateEnd": new Date('2020-01-05T13:00:00.000Z'),
+                "dateEnd": new Date('2020-01-05T12:00:00.000Z'),
             })
         )
     })
