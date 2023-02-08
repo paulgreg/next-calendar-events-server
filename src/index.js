@@ -25,12 +25,12 @@ Promise.all(calendars.map(calendar => getEvents(calendar)))
         datas.forEach(({ calendar, data }) => {
             Object.values(data)
                 .filter(({ type }) => type === 'VEVENT')
-                .forEach(ev => {
+                .forEach((ev, idx) => {
                     const { summary, start, end } = ev
                     const dateStart = formatDate(dates, start)
                     const dateEnd = formatDate(dates, end)
 
-                    console.log(dateStart, summary)
+                    console.log(idx, dateStart, summary)
 
                     const formatedEvent = formatEvent({
                         calendar,
@@ -58,13 +58,12 @@ Promise.all(calendars.map(calendar => getEvents(calendar)))
                 })
         })
         return events
-    }).then(events => {
-        return events.sort((a, b) => {
+    }).then(events => events.sort((a, b) => {
             if (a.dateStart < b.dateStart) return -1
             if (a.dateStart > b.dateStart) return 1
             return 0
         })
-    }).then(events => {
+    ).then(events => {
         fs.writeFile(SAVED_FILE, JSON.stringify(events), (err) => {
             if (err) {
                 console.log(err)
