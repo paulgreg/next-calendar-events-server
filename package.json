@@ -4,13 +4,14 @@
   "description": "Fetch next events in multiples calendars and write them in a json file",
   "main": "src/index.js",
   "scripts": {
-    "start": "mkdir -p ./dist && node src/index.js",
+    "start": "mkdir -p ./dist && DEBUG=cal node src/index.js",
     "tdd": "jest --watch",
     "test": "jest"
   },
   "author": "Grégory PAUL",
   "license": "GPL-3.0-only",
   "dependencies": {
+    "debug": "^4.3.6",
     "node-ical": "^0.19.0",
     "rrule": "^2.8.1"
   },
