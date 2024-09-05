@@ -4,7 +4,9 @@
   "description": "Fetch next events in multiples calendars and write them in a json file",
   "main": "src/index.js",
   "scripts": {
-    "start": "mkdir -p ./dist && DEBUG=cal node src/index.js",
+    "debug": "DEBUG=cal node src/index.js",
+    "deps": "mkdir -p ./dist",
+    "start": "node src/index.js",
     "tdd": "jest --watch",
     "test": "jest"
   },
