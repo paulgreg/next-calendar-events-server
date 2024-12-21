@@ -13,8 +13,8 @@
   "author": "Grégory PAUL",
   "license": "GPL-3.0-only",
   "dependencies": {
-    "debug": "^4.3.6",
-    "node-ical": "^0.19.0",
+    "debug": "^4.4.0",
+    "node-ical": "^0.20.1",
     "rrule": "^2.8.1"
   },
   "devDependencies": {
