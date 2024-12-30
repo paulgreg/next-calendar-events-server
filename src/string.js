@@ -8,22 +8,34 @@ const toString = input => {
     return ''
 }
 
-const removeAccent = (str = '') => str
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/’/g, "'") 
-    .replace(/´/g, "'") 
-    .replace(/’/g, "'") 
-
 const truncate = (l = 255) => (str = '') => str.substring(0, l)
 
+const convertToHexEscapedString = (input) => {
+  let result = ''
+
+  for (let i = 0; i < input.length; i++) {
+      const char = input[i]
+      const charCode = input.charCodeAt(i)
+
+      if (charCode > 127) {
+          // if character is a non-ASCII character
+          // Convert to hexadecimal and escape it as \xNN format
+          result += '\\x' + charCode.toString(16).padStart(2, '0')
+      } else {
+          // If ASCII character, add it directly to the result
+          result += char
+      }
+  }
+
+  return result
+}
 
 const formatEvent = (event = {}) => {
     const { calendar = '', summary = '' } = event
     return {
         ...event,
-        calendar: truncate(24)(removeAccent(toString(calendar))),
-        summary: truncate(255)(removeAccent(toString(summary))),
+        calendar: truncate(24)(convertToHexEscapedString(toString(calendar))),
+        summary: truncate(255)(convertToHexEscapedString(toString(summary))),
     }
 }
 
