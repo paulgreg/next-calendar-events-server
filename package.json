@@ -13,11 +13,11 @@
   "author": "Grégory PAUL",
   "license": "GPL-3.0-only",
   "dependencies": {
-    "debug": "^4.4.0",
-    "node-ical": "^0.20.1",
+    "debug": "^4.4.3",
+    "node-ical": "^0.21.0",
     "rrule": "^2.8.1"
   },
   "devDependencies": {
-    "jest": "^29.7.0"
+    "jest": "^30.2.0"
   }
 }
