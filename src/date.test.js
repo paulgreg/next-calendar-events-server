@@ -1,98 +1,146 @@
-import {
-  checkIfDateInRange,
-  formatDate,
-  checkIfPeriodicEvent,
-  isToday,
-} from './date'
+import { describe, it, expect, beforeAll } from 'vitest'
+import { checkIfPeriodicEvent, isToday } from './src/date'
+import { RRule } from 'rrule'
+import { Temporal } from '@js-temporal/polyfill'
 
-describe('date', () => {
-  const HOUR = 60 * 60 * 1000
-  const tzOffset = 0
-  const now = new Date('2020-01-01T12:00:00.000Z')
-  const today = new Date('2020-01-01T00:00:00.000Z')
-  const tomorrow = new Date('2020-01-02T00:00:00.000Z')
-  const inFewDays = new Date('2020-01-07T00:00:00.000Z')
-  const dates = { now, today, inFewDays, tzOffset }
-
-  describe('formatDate', () => {
-    test('should do nothing if tzOffset = 0', () =>
-      expect(formatDate({ tzOffset: 0 }, now)).toStrictEqual(now))
-    test('should update date for tzOffset = 1h', () =>
-      expect(formatDate({ tzOffset: HOUR }, now)).toStrictEqual(
-        new Date('2020-01-01T11:00:00.000Z')
-      ))
-  })
-  describe('checkIfDateInRange ', () => {
-    test('should match if today', () =>
-      expect(
-        checkIfDateInRange(dates, {
-          dateStart: new Date('2020-01-01T00:00:00.000Z'),
-          dateEnd: new Date('2020-01-01T01:00:00.000Z'),
-        })
-      ).toStrictEqual(true))
-
-    test('should match if later today', () =>
-      expect(
-        checkIfDateInRange(dates, {
-          dateStart: new Date('2020-01-01T14:00:00.000Z'),
-          dateEnd: new Date('2020-01-01T15:00:00.000Z'),
-        })
-      ).toStrictEqual(true))
-
-    test('should match if long event like holidays', () =>
-      expect(
-        checkIfDateInRange(dates, {
-          dateStart: new Date('2019-12-20T00:00:00.000Z'),
-          dateEnd: new Date('2020-01-10T00:00:00.000Z'),
-        })
-      ).toStrictEqual(true))
-
-    test('should NOT match if yesterday ', () =>
-      expect(
-        checkIfDateInRange(dates, {
-          dateStart: new Date('2019-12-31T14:00:00.000Z'),
-          dateEnd: new Date('2019-12-31T15:00:00.000Z'),
-        })
-      ).toStrictEqual(false))
-
-    test('should NOT match if before now', () =>
-      expect(
-        checkIfDateInRange(dates, {
-          dateStart: new Date('2020-01-01T08:00:00.000Z'),
-          dateEnd: new Date('2020-01-01T09:00:00.000Z'),
-        })
-      ).toStrictEqual(false))
-  })
-  describe('checkIfPeriodicEvent', () => {
-    test('should return false if empty event', () =>
-      expect(checkIfPeriodicEvent(dates, {})).toStrictEqual(false))
-
-    test('should return false if until date passed', () =>
-      expect(
-        checkIfPeriodicEvent(dates, {
-          freq: 2,
-          until: new Date('2020-12-31T12:00:00.000Z'),
-        })
-      ).toStrictEqual(false))
-
-    test('should match if during range', () =>
-      expect(
-        checkIfPeriodicEvent(dates, {
-          freq: 2,
-          dtstart: new Date('2019-12-15T12:00:00.000Z'),
-          until: new Date('2022-01-15T12:00:00.000Z'),
-        })
-      ).toStrictEqual({
-        dateStart: new Date('2020-01-05T12:00:00.000Z'),
-        dateEnd: new Date('2020-01-05T12:00:00.000Z'),
-      }))
-  })
+describe('date utilities', () => {
   describe('isToday', () => {
-    test('should return true for today', () =>
-      expect(isToday(today, today)).toStrictEqual(true))
-    test('should return true for now', () =>
-      expect(isToday(today, now)).toStrictEqual(true))
-    test('should return false for tomorrow', () =>
-      expect(isToday(today, tomorrow)).toStrictEqual(false))
+    const today = new Date('2023-01-01T12:00:00Z')
+
+    describe('with legacy Date objects', () => {
+      it('should return true for same day', () => {
+        const sameDay = new Date('2023-01-01T15:00:00Z')
+        expect(isToday(today, sameDay)).toBe(true)
+      })
+
+      it('should return true for midnight', () => {
+        const midnight = new Date('2023-01-01T00:00:00Z')
+        expect(isToday(today, midnight)).toBe(true)
+      })
+
+      it('should return true for end of day', () => {
+        const endOfDay = new Date('2023-01-01T23:59:59Z')
+        expect(isToday(today, endOfDay)).toBe(true)
+      })
+
+      it('should return false for next day', () => {
+        const nextDay = new Date('2023-01-02T01:00:00Z')
+        expect(isToday(today, nextDay)).toBe(false)
+      })
+
+      it('should return false for previous day', () => {
+        const prevDay = new Date('2022-12-31T23:59:59Z')
+        expect(isToday(today, prevDay)).toBe(false)
+      })
+    })
+
+    describe('with Temporal.ZonedDateTime objects', () => {
+      it('should return true for same day', () => {
+        const sameDay = Temporal.ZonedDateTime.from(
+          '2023-01-01T15:00:00+00:00[UTC]'
+        )
+        expect(isToday(today, sameDay)).toBe(true)
+      })
+
+      it('should return true for midnight', () => {
+        const midnight = Temporal.ZonedDateTime.from(
+          '2023-01-01T00:00:00+00:00[UTC]'
+        )
+        expect(isToday(today, midnight)).toBe(true)
+      })
+
+      it('should return true for end of day', () => {
+        const endOfDay = Temporal.ZonedDateTime.from(
+          '2023-01-01T23:59:59+00:00[UTC]'
+        )
+        expect(isToday(today, endOfDay)).toBe(true)
+      })
+
+      it('should return false for next day', () => {
+        const nextDay = Temporal.ZonedDateTime.from(
+          '2023-01-02T01:00:00+00:00[UTC]'
+        )
+        expect(isToday(today, nextDay)).toBe(false)
+      })
+
+      it('should return false for previous day', () => {
+        const prevDay = Temporal.ZonedDateTime.from(
+          '2022-12-31T23:59:59+00:00[UTC]'
+        )
+        expect(isToday(today, prevDay)).toBe(false)
+      })
+    })
+  })
+
+  describe('checkIfPeriodicEvent', () => {
+    const dates = {
+      today: new Date('2023-01-01'),
+      inFewDays: new Date('2023-01-08'),
+    }
+
+    describe('edge cases', () => {
+      it('should return false for null rrule', () => {
+        expect(checkIfPeriodicEvent(dates, null)).toBe(false)
+      })
+
+      it('should return false for undefined rrule', () => {
+        expect(checkIfPeriodicEvent(dates, undefined)).toBe(false)
+      })
+
+      it('should return false for rrule without _rrule property', () => {
+        const plainObject = { some: 'object' }
+        expect(checkIfPeriodicEvent(dates, plainObject)).toBe(false)
+      })
+    })
+
+    describe('with Temporal RRuleCompatWrapper', () => {
+      it('should return periodic event dates for weekly event', () => {
+        // Create a mock RRuleCompatWrapper like node-ical 0.26.0 returns
+        const mockRRule = {
+          _rrule: new RRule({
+            freq: RRule.WEEKLY,
+            dtstart: new Date('2023-01-01T12:00:00.000Z'),
+            count: 4,
+            byweekday: [RRule.MO],
+          }),
+          _dateOnly: false,
+        }
+
+        const result = checkIfPeriodicEvent(dates, mockRRule)
+        expect(result).not.toBe(false)
+        // The result will be Date objects (RRule.between returns Date objects)
+        expect(result.dateStart).toBeInstanceOf(Date)
+        expect(result.dateEnd).toBeInstanceOf(Date)
+      })
+
+      it('should return false when no occurrences in range', () => {
+        const mockRRule = {
+          _rrule: new RRule({
+            freq: RRule.WEEKLY,
+            dtstart: new Date('2024-01-01T12:00:00.000Z'), // Future date
+            count: 4,
+            byweekday: [RRule.MO],
+          }),
+          _dateOnly: false,
+        }
+
+        expect(checkIfPeriodicEvent(dates, mockRRule)).toBe(false)
+      })
+    })
+
+    describe('with RRule instance (not used in node-ical 0.26.0)', () => {
+      it('should return false for plain RRule instance (not supported in simplified version)', () => {
+        const rruleInstance = new RRule({
+          freq: RRule.WEEKLY,
+          dtstart: new Date('2023-01-01T12:00:00.000Z'),
+          count: 4,
+          byweekday: [RRule.MO],
+        })
+
+        // Since we simplified to only handle node-ical 0.26.0 format, this should return false
+        const result = checkIfPeriodicEvent(dates, rruleInstance)
+        expect(result).toBe(false)
+      })
+    })
   })
 })

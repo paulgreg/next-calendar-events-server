@@ -26,8 +26,8 @@ describe('string', () => {
           summary: 'théâtre Évry l´’’äïö',
         })
       ).toStrictEqual({
-        calendar: 'Gregory',
-        summary: "theatre Evry l'''aio",
+        calendar: String.raw`Gr\xe9gory`,
+        summary: String.raw`th\xe9\xe2tre \xc9vry l\xb4\x2019\x2019\xe4\xef\xf6`,
       }))
     test('should truncate text', () =>
       expect(

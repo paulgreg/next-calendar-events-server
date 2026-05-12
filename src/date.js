@@ -51,23 +51,41 @@ const isToday = (today, date) => {
   // Handle Temporal.ZonedDateTime objects from node-ical 0.26.0+
   if (date && typeof date.epochMilliseconds === 'number') {
     // Convert today to Temporal.ZonedDateTime for comparison
-    const todayTemporal = Temporal.ZonedDateTime.from(today.toISOString().replace('Z', '+00:00[UTC]'));
-    const tonightTemporal = todayTemporal.with({ 
-      hour: 23, 
-      minute: 59, 
-      second: 59, 
-      millisecond: 999 
-    });
-    return Temporal.ZonedDateTime.compare(date, tonightTemporal) <= 0;
+    const todayTemporal = Temporal.ZonedDateTime.from(
+      today.toISOString().replace('Z', '+00:00[UTC]')
+    )
+    const tonightTemporal = todayTemporal.with({
+      hour: 23,
+      minute: 59,
+      second: 59,
+      millisecond: 999,
+    })
+    const midnightTemporal = todayTemporal.with({
+      hour: 0,
+      minute: 0,
+      second: 0,
+      millisecond: 0,
+    })
+    return (
+      Temporal.ZonedDateTime.compare(date, midnightTemporal) >= 0 &&
+      Temporal.ZonedDateTime.compare(date, tonightTemporal) <= 0
+    )
   }
-  
+
   // Handle regular Date objects (backward compatibility)
   const tonight = new Date(today)
   tonight.setUTCHours(23)
   tonight.setUTCMinutes(59)
   tonight.setUTCSeconds(59)
   tonight.setUTCMilliseconds(999)
-  return date <= tonight
+
+  const midnight = new Date(today)
+  midnight.setUTCHours(0)
+  midnight.setUTCMinutes(0)
+  midnight.setUTCSeconds(0)
+  midnight.setUTCMilliseconds(0)
+
+  return date >= midnight && date <= tonight
 }
 
 module.exports = {
