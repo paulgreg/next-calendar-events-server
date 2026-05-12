@@ -1,4 +1,5 @@
 const { RRule } = require('rrule')
+const { Temporal } = require('@js-temporal/polyfill')
 
 const DAY = 24 * 60 * 60 * 1000
 
@@ -47,6 +48,20 @@ const checkIfPeriodicEvent = (dates, rrule) => {
 }
 
 const isToday = (today, date) => {
+  // Handle Temporal.ZonedDateTime objects from node-ical 0.26.0+
+  if (date && typeof date.epochMilliseconds === 'number') {
+    // Convert today to Temporal.ZonedDateTime for comparison
+    const todayTemporal = Temporal.ZonedDateTime.from(today.toISOString().replace('Z', '+00:00[UTC]'));
+    const tonightTemporal = todayTemporal.with({ 
+      hour: 23, 
+      minute: 59, 
+      second: 59, 
+      millisecond: 999 
+    });
+    return Temporal.ZonedDateTime.compare(date, tonightTemporal) <= 0;
+  }
+  
+  // Handle regular Date objects (backward compatibility)
   const tonight = new Date(today)
   tonight.setUTCHours(23)
   tonight.setUTCMinutes(59)
