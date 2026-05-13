@@ -12,6 +12,7 @@
   "author": "Grégory PAUL",
   "license": "GPL-3.0-only",
   "dependencies": {
+    "@js-temporal/polyfill": "^0.5.1",
     "debug": "^4.4.3",
     "node-ical": "^0.26.1",
     "rrule": "^2.8.1"
