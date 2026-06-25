@@ -114,22 +114,47 @@ describe('event sorting', () => {
     })
   })
 
-  describe('with mixed Date and Temporal objects', () => {
-    it('should handle mixed types without error', () => {
-      const events = [
-        createEvent(new Date('2023-01-02')),
-        createEvent(
-          Temporal.ZonedDateTime.from('2023-01-01T00:00:00+00:00[UTC]')
-        ),
-        createEvent(new Date('2023-01-03')),
-      ]
+   describe('with mixed Date and Temporal objects', () => {
+     it('should handle mixed types without error', () => {
+       const events = [
+         createEvent(new Date('2023-01-02')),
+         createEvent(
+           Temporal.ZonedDateTime.from('2023-01-01T00:00:00+00:00[UTC]')
+         ),
+         createEvent(new Date('2023-01-03')),
+       ]
 
-      // Should not throw and should maintain some order
-      // When mixing types, Temporal objects should come first
-      const sorted = sortEvents(events)
-      expect(sorted).toHaveLength(3)
-      // The Temporal object should be first since it has epochMilliseconds
-      expect(typeof sorted[0].dateStart.epochMilliseconds).toBe('number')
-    })
-  })
+       // Should not throw and should maintain some order
+       // When mixing types, Temporal objects should come first
+       const sorted = sortEvents(events)
+       expect(sorted).toHaveLength(3)
+       // The Temporal object should be first since it has epochMilliseconds
+       expect(typeof sorted[0].dateStart.epochMilliseconds).toBe('number')
+     })
+
+     it('should sort mixed types chronologically', () => {
+       const temporalEarly = Temporal.ZonedDateTime.from('2023-01-01T00:00:00+00:00[UTC]')
+       const dateMiddle = new Date('2023-01-02T12:00:00Z')
+       const temporalLate = Temporal.ZonedDateTime.from('2023-01-03T00:00:00+00:00[UTC]')
+       const dateEarly = new Date('2023-01-01T12:00:00Z')
+
+       const events = [
+         createEvent(dateMiddle),
+         createEvent(temporalLate),
+         createEvent(dateEarly),
+         createEvent(temporalEarly),
+       ]
+
+       const sorted = sortEvents(events)
+       expect(sorted).toHaveLength(4)
+       // temporalEarly (2023-01-01T00:00) should be first
+       expect(sorted[0].dateStart).toBe(temporalEarly)
+       // dateEarly (2023-01-01T12:00) should be second
+       expect(sorted[1].dateStart).toBe(dateEarly)
+       // dateMiddle (2023-01-02T12:00) should be third
+       expect(sorted[2].dateStart).toBe(dateMiddle)
+       // temporalLate (2023-01-03T00:00) should be last
+       expect(sorted[3].dateStart).toBe(temporalLate)
+     })
+   })
 })

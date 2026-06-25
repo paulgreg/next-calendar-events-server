@@ -89,8 +89,28 @@ Promise.all(calendars.map(getEvents))
   .then((events) =>
     events.toSorted((a, b) => {
       // Handle Temporal.ZonedDateTime objects
-      if (a.dateStart && typeof a.dateStart.epochMilliseconds === 'number') {
+      if (
+        a.dateStart &&
+        typeof a.dateStart.epochMilliseconds === 'number' &&
+        b.dateStart &&
+        typeof b.dateStart.epochMilliseconds === 'number'
+      ) {
         return a.dateStart.epochMilliseconds - b.dateStart.epochMilliseconds
+      }
+      // Handle mixed: Temporal vs Date - convert Date to timestamp for comparison
+      if (
+        a.dateStart &&
+        typeof a.dateStart.epochMilliseconds === 'number' &&
+        b.dateStart instanceof Date
+      ) {
+        return a.dateStart.epochMilliseconds - b.dateStart.getTime()
+      }
+      if (
+        a.dateStart instanceof Date &&
+        b.dateStart &&
+        typeof b.dateStart.epochMilliseconds === 'number'
+      ) {
+        return a.dateStart.getTime() - b.dateStart.epochMilliseconds
       }
       // Handle regular Date objects
       if (a.dateStart < b.dateStart) return -1
