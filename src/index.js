@@ -17,7 +17,7 @@ const dates = getDates()
 const { today } = dates
 
 const getEvents = async ({ url, auth, calendar }) => {
-  const maxRetries = 3
+  const maxRetries = 5
   let retries = 0
 
   while (retries < maxRetries) {
@@ -35,7 +35,7 @@ const getEvents = async ({ url, auth, calendar }) => {
           `Failed to fetch events from ${calendar} after ${maxRetries} attempts: ${error.message}`
         )
       }
-      const backoff = 1000 * retries
+      const backoff = 5000 * retries
       if (d.enabled)
         d(
           `Attempt ${retries} failed for ${calendar}. Retrying in ${backoff} ms...`
